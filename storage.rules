@@ -1,0 +1,20 @@
+rules_version = '2';
+
+service firebase.storage {
+  match /b/{bucket}/o {
+    
+    // Папка videos - только аутентифицированные пользователи могут загружать
+    match /videos/{videoId} {
+      // Разрешить загрузку только аутентифицированным пользователям
+      allow write: if request.auth != null;
+      
+      // Разрешить чтение всем (для публикации через Cloud Functions)
+      allow read: if true;
+    }
+    
+    // Все остальные файлы - только для аутентифицированных
+    match /{allPaths=**} {
+      allow read, write: if request.auth != null;
+    }
+  }
+}
